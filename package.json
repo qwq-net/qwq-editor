@@ -1,0 +1,16 @@
+{
+  "name": "qwq-editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "playground": "pnpm --filter playground dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
