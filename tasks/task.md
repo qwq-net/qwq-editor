@@ -15,12 +15,14 @@ qwqb-web（Astro + Cloudflare Pages）への統合を最初のターゲットと
 ### フェーズ1: 基盤
 
 - [x] モノレポ初期化（pnpm-workspace.yaml, tsconfig.base.json, package.json, .gitignore）
-- [ ] `@qwq-net/core` 実装
-  - [ ] `defineConfig()` + Zod スキーマ
-  - [ ] `StorageAdapter` インターフェース
-  - [ ] `LocalStorageAdapter`（Node.js fs + gray-matter）
-  - [ ] `toMDX.ts` シリアライザ（named import方式、ユニットテスト付き）
-  - [ ] `fromMarkdown.ts` デシリアライザ
+- [x] `@qwq-net/core` 実装
+  - [x] `defineConfig()` + Zod スキーマ
+  - [x] `StorageAdapter` インターフェース
+  - [x] `LocalStorageAdapter`（Node.js fs + gray-matter）
+  - [x] `toMDX.ts` シリアライザ（named import方式、ユニットテスト付き）
+  - [x] `toMarkdown.ts` シリアライザ
+  - [x] `fromMarkdown.ts` デシリアライザ（MDX named import → image node変換含む）
+  - [x] Vitest ユニットテスト（27テスト、全パス）
 - [ ] `apps/playground` セットアップ（Vite React SPA）
 
 ### フェーズ2: エディタUI
