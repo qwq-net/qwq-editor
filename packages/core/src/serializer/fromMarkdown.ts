@@ -1,4 +1,4 @@
-import matter from 'gray-matter';
+import { parseFrontmatter } from '../utils/frontmatter.js';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -42,32 +42,34 @@ function extractImports(content: string): {
 } {
   const importMap = new Map<string, string>();
   const lines = content.split('\n');
-  const bodyLines: string[] = [];
-  let inImportBlock = true;
+  let importBlockEnd = 0;
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (inImportBlock) {
-      // Match: import X from './path' or import X from "../path"
-      const m = trimmed.match(/^import\s+(\w+)\s+from\s+['"]([^'"]+)['"]\s*;?$/);
-      if (m) {
-        const [, varName, importPath] = m;
-        // Only record relative paths (image imports)
-        if (importPath.startsWith('./') || importPath.startsWith('../')) {
-          importMap.set(varName, importPath);
-        }
-        // Skip this line (don't include in body)
-        continue;
-      }
-      // Once we hit a non-import non-blank line, exit import block
-      if (trimmed !== '') {
-        inImportBlock = false;
-      }
+  // Phase 1: consume the leading import block (imports + blank lines)
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+
+    // Blank lines within the import block are skipped
+    if (trimmed === '') {
+      importBlockEnd = i + 1;
+      continue;
     }
-    bodyLines.push(line);
+
+    // Match: import X from './path'
+    const m = trimmed.match(/^import\s+(\w+)\s+from\s+['"]([^'"]+)['"]\s*;?$/);
+    if (m) {
+      const [, varName, importPath] = m;
+      if (importPath.startsWith('./') || importPath.startsWith('../')) {
+        importMap.set(varName, importPath);
+      }
+      importBlockEnd = i + 1;
+      continue;
+    }
+
+    // Non-import, non-blank line → end of import block
+    break;
   }
 
-  return { importMap, body: bodyLines.join('\n') };
+  return { importMap, body: lines.slice(importBlockEnd).join('\n') };
 }
 
 /**
@@ -277,7 +279,7 @@ export type ParsedContent = {
 
 export function fromMarkdown(mdxString: string): ParsedContent {
   // 1. Extract YAML frontmatter
-  const { data: frontmatter, content: rawContent } = matter(mdxString);
+  const { data: frontmatter, content: rawContent } = parseFrontmatter(mdxString);
 
   // 2. Preprocess MDX: extract imports, replace JSX image components
   const { importMap, body: processedBody } = extractImports(rawContent);

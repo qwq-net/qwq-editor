@@ -182,4 +182,34 @@ describe('toMDX', () => {
     const importCount = (result.match(/import hero from/g) ?? []).length;
     expect(importCount).toBe(1);
   });
+
+  it('serializes bold+code marks in correct nesting order', () => {
+    const d = doc({
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'code',
+          marks: [{ type: 'bold' }, { type: 'code' }],
+        },
+      ],
+    });
+    const result = toMDX(d, {}, baseConfig);
+    // code should be innermost: **`code`**
+    expect(result).toContain('**`code`**');
+  });
+
+  it('serializes empty frontmatter', () => {
+    const result = toMDX(doc(), {}, baseConfig);
+    expect(result).toMatch(/^---\n---/);
+  });
+
+  it('serializes blockquote', () => {
+    const d = doc({
+      type: 'blockquote',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'quoted' }] }],
+    });
+    const result = toMDX(d, {}, baseConfig);
+    expect(result).toContain('> quoted');
+  });
 });

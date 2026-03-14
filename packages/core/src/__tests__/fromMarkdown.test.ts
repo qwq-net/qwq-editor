@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { fromMarkdown } from '../serializer/fromMarkdown.js';
+import { toMDX } from '../serializer/toMDX.js';
 
 const fm = (extra = '') => `---
 title: 'Test Post'
@@ -117,5 +118,75 @@ Body text.
     const { doc } = fromMarkdown(`${fm()}~~deleted~~`);
     const content = doc.content[0].content ?? [];
     expect(content.some((n) => n.marks?.some((m) => m.type === 'strike'))).toBe(true);
+  });
+
+  it('parses empty frontmatter', () => {
+    const { frontmatter, doc } = fromMarkdown('---\n---\nHello');
+    expect(Object.keys(frontmatter)).toHaveLength(0);
+    expect(doc.content[0]).toMatchObject({
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Hello' }],
+    });
+  });
+
+  it('does not leak import block blank lines into body', () => {
+    const mdx = `---
+title: Test
+---
+
+import Img from '@/components/Img.astro';
+import hero from './hero.jpg';
+
+Body start.
+`;
+    const { doc } = fromMarkdown(mdx);
+    // First block node should be the paragraph "Body start.", not blank lines
+    expect(doc.content[0]).toMatchObject({
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Body start.' }],
+    });
+  });
+
+  it('parses a blockquote', () => {
+    const { doc } = fromMarkdown(`${fm()}> quoted text`);
+    expect(doc.content[0].type).toBe('blockquote');
+    const inner = doc.content[0].content?.[0];
+    expect(inner?.type).toBe('paragraph');
+  });
+});
+
+describe('roundtrip (fromMarkdown → toMDX → fromMarkdown)', () => {
+  it('preserves content structure through a roundtrip', () => {
+    const original = `---
+title: Roundtrip Test
+---
+
+## Heading
+
+A **bold** paragraph with a [link](https://example.com/).
+
+- Item one
+- Item two
+`;
+    const config = {
+      type: 'instant' as const,
+      contentDir: './content',
+      fileLayout: 'directory' as const,
+      fileExtension: 'mdx' as const,
+      imageStyle: 'plain' as const,
+      imageComponent: 'Img',
+      imageComponentImport: '@/Img',
+      editorPath: '/__editor',
+    };
+
+    const first = fromMarkdown(original);
+    const mdxString = toMDX(first.doc, first.frontmatter, config);
+    const second = fromMarkdown(mdxString);
+
+    expect(second.frontmatter.title).toBe('Roundtrip Test');
+    expect(second.doc.content).toHaveLength(first.doc.content.length);
+    expect(second.doc.content[0].type).toBe('heading');
+    expect(second.doc.content[1].type).toBe('paragraph');
+    expect(second.doc.content[2].type).toBe('bulletList');
   });
 });
