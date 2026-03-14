@@ -22,19 +22,22 @@ qwqb-web（Astro + Cloudflare Pages）への統合を最初のターゲットと
   - [x] `toMDX.ts` シリアライザ（named import方式、ユニットテスト付き）
   - [x] `toMarkdown.ts` シリアライザ
   - [x] `fromMarkdown.ts` デシリアライザ（MDX named import → image node変換含む）
-  - [x] Vitest ユニットテスト（27テスト、全パス）
+  - [x] Vitest ユニットテスト（34テスト、全パス）
+  - [x] `defineConfig()` の入力型を `z.input<>` に修正（Zodデフォルト値をオプション扱いに）
 - [x] `apps/playground` セットアップ（Vite React SPA）
 
 ### フェーズ2: エディタUI
 
-- [ ] `@qwq-net/editor` 実装
-  - [ ] Tiptap基本セットアップ（`useRichEditor`）
-  - [ ] `Toolbar`（TextGroup / HeadingGroup / InsertGroup / HistoryGroup）
-  - [ ] `BubbleMenu`（テキスト選択時フローティングメニュー）
-  - [ ] `FrontmatterPanel`（折りたたみ可能なメタデータ欄）
-  - [ ] `SlashMenu`（`/`コマンドパレット）
-  - [ ] `ImageUploadExtension`（drag/drop/paste → StorageAdapter）
-  - [ ] `useSave`（debounce + Ctrl+S）
+- [x] `@qwq-net/editor` 実装
+  - [x] Tiptap基本セットアップ（`useRichEditor`）
+  - [x] `Toolbar`（TextGroup / HeadingGroup / InsertGroup / HistoryGroup）
+  - [x] `BubbleMenu`（テキスト選択時フローティングメニュー）
+  - [x] `FrontmatterPanel`（折りたたみ可能なメタデータ欄）
+  - [x] `SlashMenu`（`/`コマンドパレット、10コマンド対応）
+  - [x] `ImageUploadExtension`（drag/drop/paste → StorageAdapter）
+  - [x] `useSave`（debounce + Ctrl+S）
+  - [x] `editor.css`（Catppuccin テーマ、CSS変数ベース）
+- [x] playground に `RichEditor` タブを追加
 
 ### フェーズ3: インスタントモード
 
