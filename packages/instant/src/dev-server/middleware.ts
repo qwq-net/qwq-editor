@@ -16,10 +16,15 @@ const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript',
   '.css': 'text/css',
+  '.json': 'application/json',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.woff2': 'font/woff2',
+  '.woff': 'font/woff',
 };
 
 async function serveStatic(pathname: string, res: ServerResponse): Promise<boolean> {
@@ -43,7 +48,12 @@ async function serveStatic(pathname: string, res: ServerResponse): Promise<boole
 }
 
 export function createMiddleware(config: EditorConfig, root: string) {
-  const instantConfig = config.mode as InstantModeConfig;
+  if (config.mode.type !== 'instant') {
+    throw new Error(
+      `[qwq-editor] Instant mode middleware requires mode.type === 'instant', got '${config.mode.type}'`,
+    );
+  }
+  const instantConfig = config.mode;
 
   return async function qwqEditorMiddleware(
     req: IncomingMessage,

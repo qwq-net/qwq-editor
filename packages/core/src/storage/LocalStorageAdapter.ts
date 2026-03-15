@@ -1,6 +1,5 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import matter from 'gray-matter';
 import type { StorageAdapter, ContentContext } from './StorageAdapter.js';
 import type { InstantModeConfig } from '../config/schema.js';
 

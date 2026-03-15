@@ -34,7 +34,7 @@ export async function handleUpload(
     const imageDir =
       config.fileLayout === 'directory'
         ? path.join(contentDir, slug)
-        : contentDir;
+        : path.join(contentDir, 'images');
 
     await fs.mkdir(imageDir, { recursive: true });
 
@@ -44,8 +44,12 @@ export async function handleUpload(
     const buffer = await readBinaryBody(req);
     await fs.writeFile(dest, buffer);
 
+    // directory layout: image is alongside index.mdx → ./image.png
+    // flat layout: image goes into images/ subdir → ./images/image.png
     const src =
-      config.fileLayout === 'directory' ? `./${safeFilename}` : `./${safeFilename}`;
+      config.fileLayout === 'directory'
+        ? `./${safeFilename}`
+        : `./images/${safeFilename}`;
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ src, alt: '' }));

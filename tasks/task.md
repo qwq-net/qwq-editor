@@ -57,6 +57,16 @@ qwqb-web（Astro + Cloudflare Pages）への統合を最初のターゲットと
   - [x] AstroIntegration（`astro:config:setup` フック）
   - [x] `LocalStorageAdapter.saveContent` のfrontmatter二重書き込みバグ修正
 
+### 品質チェック・リファクタリング
+
+- [x] TypeScript `any` 型削減（SlashExtension, useRichEditor）
+- [x] `useSave` エラーハンドリング強化（`isSaving` 状態、`onSaveError` コールバック）
+- [x] `upload.ts` flat/directoryレイアウトでの画像パス修正（CRITICALバグ）
+- [x] ミドルウェアのMIMEタイプ追加・config.mode バリデーション
+- [x] playground タブ切替時のRichEditor状態保持（CSS display切替）
+- [x] `SuggestionCallbackProps` → Tiptap公式型（`SuggestionProps` / `SuggestionKeyDownProps`）
+- [x] 全パッケージ typecheck / test / build パス確認
+
 ### フェーズ4: qwqb-webで動作確認
 
 - [ ] `file:../qwq-editor/packages/instant` でローカルリンク

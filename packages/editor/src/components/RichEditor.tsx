@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EditorContent } from '@tiptap/react';
-import type { EditorConfig, StorageAdapter, ContentContext } from '@qwq-net/core';
+import type { EditorConfig, StorageAdapter, ContentContext, TiptapDoc } from '@qwq-net/core';
 import { useRichEditor } from '../hooks/useRichEditor.js';
 import { useSave } from '../hooks/useSave.js';
 import { useImageUpload } from '../hooks/useImageUpload.js';
@@ -14,6 +14,7 @@ export interface RichEditorProps {
   initialContent?: string;
   storageAdapter?: StorageAdapter;
   onSave?: (result: { location: string }) => void;
+  onChange?: (data: { doc: TiptapDoc; frontmatter: Record<string, unknown> }) => void;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export function RichEditor({
   initialContent,
   storageAdapter,
   onSave,
+  onChange,
   className,
 }: RichEditorProps) {
   const contentContext: ContentContext = { slug };
@@ -47,6 +49,27 @@ export function RichEditor({
 
   const { uploadImage, isUploading } = useImageUpload(editor, storageAdapter, contentContext);
 
+  // Emit onChange when editor content updates
+  useEffect(() => {
+    if (!editor || !onChange) return;
+    const handler = () => {
+      onChange({ doc: editor.getJSON() as TiptapDoc, frontmatter });
+    };
+    editor.on('update', handler);
+    return () => { editor.off('update', handler); };
+  }, [editor, onChange, frontmatter]);
+
+  // Emit onChange when frontmatter updates
+  const handleFrontmatterChange = useCallback(
+    (updated: Record<string, unknown>) => {
+      setFrontmatter(updated);
+      if (editor && onChange) {
+        onChange({ doc: editor.getJSON() as TiptapDoc, frontmatter: updated });
+      }
+    },
+    [editor, onChange],
+  );
+
   if (!editor) return null;
 
   return (
@@ -54,7 +77,7 @@ export function RichEditor({
       <FrontmatterPanel
         config={config}
         frontmatter={frontmatter}
-        onChange={setFrontmatter}
+        onChange={handleFrontmatterChange}
       />
 
       <div className="qwq-editor-main">

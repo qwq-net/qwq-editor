@@ -1,10 +1,10 @@
-import { Extension } from '@tiptap/core';
+import { Extension, type Editor, type Range } from '@tiptap/core';
 import Suggestion, { type SuggestionOptions } from '@tiptap/suggestion';
 
 export type SlashCommand = {
   title: string;
   description: string;
-  command: (args: { editor: any; range: { from: number; to: number } }) => void;
+  command: (args: { editor: Editor; range: Range }) => void;
 };
 
 export const defaultCommands: SlashCommand[] = [
@@ -12,21 +12,21 @@ export const defaultCommands: SlashCommand[] = [
     title: '見出し1',
     description: '大見出し (H1)',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
     },
   },
   {
     title: '見出し2',
     description: '中見出し (H2)',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
     },
   },
   {
     title: '見出し3',
     description: '小見出し (H3)',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
     },
   },
   {
@@ -35,21 +35,21 @@ export const defaultCommands: SlashCommand[] = [
     command: ({ editor, range }) => {
       const url = window.prompt('画像URL:');
       if (!url) return;
-      (editor as any).chain().focus().deleteRange(range).setImage({ src: url }).run();
+      editor.chain().focus().deleteRange(range).setImage({ src: url }).run();
     },
   },
   {
     title: 'コードブロック',
     description: 'コードの挿入',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setNode('codeBlock').run();
+      editor.chain().focus().deleteRange(range).setNode('codeBlock').run();
     },
   },
   {
     title: 'テーブル',
     description: '3×3テーブルの挿入',
     command: ({ editor, range }) => {
-      (editor as any)
+      editor
         .chain()
         .focus()
         .deleteRange(range)
@@ -61,28 +61,28 @@ export const defaultCommands: SlashCommand[] = [
     title: '区切り線',
     description: '水平区切り線',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setHorizontalRule().run();
+      editor.chain().focus().deleteRange(range).setHorizontalRule().run();
     },
   },
   {
     title: '引用',
     description: '引用ブロック',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).setBlockquote().run();
+      editor.chain().focus().deleteRange(range).setBlockquote().run();
     },
   },
   {
     title: '箇条書き',
     description: '箇条書きリスト',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).toggleBulletList().run();
+      editor.chain().focus().deleteRange(range).toggleBulletList().run();
     },
   },
   {
     title: '番号付きリスト',
     description: '番号付きリスト',
     command: ({ editor, range }) => {
-      (editor as any).chain().focus().deleteRange(range).toggleOrderedList().run();
+      editor.chain().focus().deleteRange(range).toggleOrderedList().run();
     },
   },
 ];
@@ -98,7 +98,15 @@ export const SlashExtension = Extension.create<SlashExtensionOptions>({
     return {
       suggestion: {
         char: '/',
-        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
+        command: ({
+          editor,
+          range,
+          props,
+        }: {
+          editor: Editor;
+          range: Range;
+          props: SlashCommand;
+        }) => {
           props.command({ editor, range });
         },
       },

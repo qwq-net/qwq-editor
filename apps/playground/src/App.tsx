@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { fromMarkdown, toMDX, toMarkdown, defineConfig } from '@qwq-net/core';
 import type { TiptapDoc } from '@qwq-net/core';
 import { RichEditor } from '@qwq-net/editor';
@@ -23,6 +23,8 @@ const config = defineConfig({
     draft:       { type: 'boolean', label: 'Draft', defaultValue: false },
   },
 });
+
+const instantConfig = config.mode as import('@qwq-net/core').InstantModeConfig;
 
 const SAMPLE_MDX = `---
 title: 'Sample Post'
@@ -62,23 +64,55 @@ console.log(greeting('world'));
 | fromMarkdown | Done |
 `;
 
+// Data source: either from the textarea or from the RichEditor
+type Source = 'textarea' | 'editor';
+
 type Tab = 'editor' | 'doc' | 'mdx' | 'md';
 
 export default function App() {
   const [input, setInput] = useState(SAMPLE_MDX);
   const [activeTab, setActiveTab] = useState<Tab>('editor');
 
-  let parsed: { frontmatter: Record<string, unknown>; doc: TiptapDoc } | null = null;
+  // Track the live editor state separately so edits in the RichEditor
+  // are reflected in the other tabs without re-parsing the textarea.
+  const [editorDoc, setEditorDoc] = useState<TiptapDoc | null>(null);
+  const [editorFrontmatter, setEditorFrontmatter] = useState<Record<string, unknown>>({});
+  const sourceRef = useRef<Source>('textarea');
+
+  // Determine which data to show in the output tabs
+  let doc: TiptapDoc | null = null;
+  let frontmatter: Record<string, unknown> = {};
   let parseError: string | null = null;
-  try {
-    parsed = fromMarkdown(input);
-  } catch (e) {
-    parseError = String(e);
+
+  if (sourceRef.current === 'editor' && editorDoc) {
+    doc = editorDoc;
+    frontmatter = editorFrontmatter;
+  } else {
+    try {
+      const parsed = fromMarkdown(input);
+      doc = parsed.doc;
+      frontmatter = parsed.frontmatter;
+    } catch (e) {
+      parseError = String(e);
+    }
   }
 
-  const instantConfig = config.mode as import('@qwq-net/core').InstantModeConfig;
-  const mdxOutput = parsed ? toMDX(parsed.doc, parsed.frontmatter, instantConfig) : '';
-  const mdOutput = parsed ? toMarkdown(parsed.doc, parsed.frontmatter) : '';
+  const mdxOutput = doc ? toMDX(doc, frontmatter, instantConfig) : '';
+  const mdOutput = doc ? toMarkdown(doc, frontmatter) : '';
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    sourceRef.current = 'textarea';
+    setInput(e.target.value);
+  };
+
+  const handleEditorChange = useCallback(
+    (data: { doc: TiptapDoc; frontmatter: Record<string, unknown> }) => {
+      sourceRef.current = 'editor';
+      setEditorDoc(data.doc);
+      setEditorFrontmatter(data.frontmatter);
+    },
+    [],
+  );
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'editor', label: 'RichEditor' },
@@ -91,10 +125,17 @@ export default function App() {
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '100vh', background: '#1e1e2e' }}>
       {/* Left: Input textarea */}
       <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid #333' }}>
-        <div style={headerStyle}>Input MDX</div>
+        <div style={headerStyle}>
+          Input MDX
+          {sourceRef.current === 'editor' && (
+            <span style={{ marginLeft: 8, color: '#a6e3a1', fontSize: 11, fontWeight: 400 }}>
+              (editor → output synced)
+            </span>
+          )}
+        </div>
         <textarea
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleTextareaChange}
           style={textareaStyle}
           spellCheck={false}
         />
@@ -123,24 +164,30 @@ export default function App() {
           ))}
         </div>
 
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          {parseError ? (
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+          {parseError && (
             <div style={{ padding: '16px', color: '#f38ba8', fontFamily: 'monospace', fontSize: '13px' }}>
               Parse error: {parseError}
             </div>
-          ) : activeTab === 'editor' ? (
-            <div style={{ height: '100%' }}>
-              <RichEditor
-                slug="playground-post"
-                config={config}
-                initialContent={input}
-              />
-            </div>
-          ) : activeTab === 'doc' && parsed ? (
-            <DocInspector doc={parsed.doc} frontmatter={parsed.frontmatter} />
-          ) : activeTab === 'mdx' ? (
+          )}
+
+          {/* RichEditor is always mounted but hidden when not active — prevents losing edits on tab switch */}
+          <div style={{ height: '100%', display: activeTab === 'editor' ? 'block' : 'none' }}>
+            <RichEditor
+              slug="playground-post"
+              config={config}
+              initialContent={input}
+              onChange={handleEditorChange}
+            />
+          </div>
+
+          {activeTab === 'doc' && doc && (
+            <DocInspector doc={doc} frontmatter={frontmatter} />
+          )}
+          {activeTab === 'mdx' && (
             <MdxPreview content={mdxOutput} label="MDX output (toMDX)" />
-          ) : (
+          )}
+          {activeTab === 'md' && (
             <MdxPreview content={mdOutput} label="Markdown output (toMarkdown)" />
           )}
         </div>

@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useEditor } from '@tiptap/react';
+import { type Editor, type Range } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Table from '@tiptap/extension-table';
@@ -13,7 +13,12 @@ import { createLowlight, common } from 'lowlight';
 import type { EditorConfig, StorageAdapter, ContentContext } from '@qwq-net/core';
 import { fromMarkdown } from '@qwq-net/core';
 import { ImageUploadExtension } from '../extensions/ImageUploadExtension.js';
-import { SlashExtension, defaultCommands } from '../extensions/SlashExtension.js';
+import type { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion';
+import {
+  SlashExtension,
+  defaultCommands,
+  type SlashCommand,
+} from '../extensions/SlashExtension.js';
 import type { SlashMenuRef } from '../components/SlashMenu/SlashMenu.js';
 import { ReactRenderer } from '@tiptap/react';
 
@@ -58,20 +63,27 @@ export function useRichEditor({
             defaultCommands.filter((cmd) =>
               cmd.title.toLowerCase().includes(query.toLowerCase()),
             ),
-          command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
-            props.command({ editor, range });
+          command: ({
+            editor: ed,
+            range,
+            props,
+          }: {
+            editor: Editor;
+            range: Range;
+            props: SlashCommand;
+          }) => {
+            props.command({ editor: ed, range });
           },
           render: () => {
             let component: ReactRenderer<SlashMenuRef>;
             let popupEl: HTMLDivElement;
 
             return {
-              onStart(props: any) {
+              onStart(props: SuggestionProps<SlashCommand>) {
                 popupEl = document.createElement('div');
                 popupEl.className = 'qwq-slash-popup';
                 document.body.appendChild(popupEl);
 
-                // Dynamically import to avoid circular deps at module load time
                 import('../components/SlashMenu/SlashMenu.js').then(({ SlashMenu }) => {
                   component = new ReactRenderer(SlashMenu, {
                     props,
@@ -82,17 +94,19 @@ export function useRichEditor({
                 });
               },
 
-              onUpdate(props: any) {
+              onUpdate(props: SuggestionProps<SlashCommand>) {
                 component?.updateProps(props);
                 positionPopup(popupEl, props);
               },
 
-              onKeyDown(props: any) {
+              onKeyDown(props: SuggestionKeyDownProps) {
                 if (props.event.key === 'Escape') {
                   popupEl?.remove();
                   return true;
                 }
-                return (component?.ref as SlashMenuRef | null)?.onKeyDown(props.event) ?? false;
+                return (
+                  (component?.ref as SlashMenuRef | null)?.onKeyDown(props.event) ?? false
+                );
               },
 
               onExit() {
@@ -107,20 +121,13 @@ export function useRichEditor({
     content: parsed?.doc ?? { type: 'doc', content: [{ type: 'paragraph' }] },
   });
 
-  // Update content when initialContent changes externally
-  useEffect(() => {
-    if (!editor || !initialContent) return;
-    const newParsed = fromMarkdown(initialContent);
-    editor.commands.setContent(newParsed.doc);
-  }, [initialContent]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return {
     editor,
     frontmatter: parsed?.frontmatter ?? {},
   };
 }
 
-function positionPopup(el: HTMLDivElement, props: any) {
+function positionPopup(el: HTMLDivElement, props: SuggestionProps<SlashCommand>) {
   const rect = props.clientRect?.();
   if (!rect || !el) return;
   el.style.position = 'fixed';
