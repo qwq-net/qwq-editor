@@ -41,14 +41,21 @@ qwqb-web（Astro + Cloudflare Pages）への統合を最初のターゲットと
 
 ### フェーズ3: インスタントモード
 
-- [ ] `@qwq-net/instant` 実装
-  - [ ] ローカルAPI（gray-matterでファイル読み書き）
-    - [ ] `GET /__editor/api/content/:slug`
-    - [ ] `POST /__editor/api/save`
-    - [ ] `POST /__editor/api/upload`
-  - [ ] Viteプラグイン（`apply: 'serve'`、本番ビルド影響ゼロ）
-  - [ ] エディタSPA（一覧 / 新規作成 / 編集）のパッケージ同梱
-  - [ ] AstroIntegration（`astro:config:setup` フック）
+- [x] `@qwq-net/instant` 実装
+  - [x] ローカルAPI（gray-matterでファイル読み書き）
+    - [x] `GET /__editor/api/config` — エディタ設定をJSONで返す
+    - [x] `GET /__editor/api/list` — contentDirのスラッグ一覧
+    - [x] `GET /__editor/api/content?slug=xxx` — ファイル内容を返す
+    - [x] `POST /__editor/api/save` — `{ content, slug }` でファイル書き込み
+    - [x] `POST /__editor/api/upload?slug=xxx&filename=xxx` — バイナリ画像保存
+  - [x] Viteプラグイン（`apply: 'serve'`、本番ビルド影響ゼロ）
+  - [x] エディタSPA（一覧 / 新規作成 / 編集）のパッケージ同梱
+    - [x] `LocalApiAdapter` — StorageAdapterをAPI経由で実装
+    - [x] `ListPage` — コンテンツ一覧
+    - [x] `NewPage` — スラッグ入力して新規作成
+    - [x] `EditPage` — `RichEditor` を使った編集画面
+  - [x] AstroIntegration（`astro:config:setup` フック）
+  - [x] `LocalStorageAdapter.saveContent` のfrontmatter二重書き込みバグ修正
 
 ### フェーズ4: qwqb-webで動作確認
 

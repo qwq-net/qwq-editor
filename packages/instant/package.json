@@ -1,0 +1,45 @@
+{
+  "name": "@qwq-net/instant",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm build:app && pnpm build:plugin",
+    "build:app": "vite build --config vite.editor-app.config.ts",
+    "build:plugin": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@qwq-net/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "astro": ">=4.0.0",
+    "vite": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "astro": { "optional": true }
+  },
+  "devDependencies": {
+    "@qwq-net/editor": "workspace:*",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "astro": "^5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.0"
+  }
+}

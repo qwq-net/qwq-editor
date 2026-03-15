@@ -26,14 +26,15 @@ export class LocalStorageAdapter implements StorageAdapter {
 
   async saveContent(
     content: string,
-    frontmatter: Record<string, unknown>,
+    _frontmatter: Record<string, unknown>,
     ctx: ContentContext,
   ): Promise<{ location: string }> {
+    // `content` is the fully serialized file (toMDX / toMarkdown already includes frontmatter).
+    // `_frontmatter` is available for adapters that need metadata separately (e.g. S3/DB).
     const filePath = this.resolveContentPath(ctx);
     const dir = path.dirname(filePath);
     await fs.mkdir(dir, { recursive: true });
-    const output = matter.stringify(content, frontmatter);
-    await fs.writeFile(filePath, output, 'utf-8');
+    await fs.writeFile(filePath, content, 'utf-8');
     return { location: filePath };
   }
 
