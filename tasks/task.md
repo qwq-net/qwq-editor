@@ -69,17 +69,19 @@ qwqb-web（Astro + Cloudflare Pages）への統合を最初のターゲットと
 
 ### フェーズ4: qwqb-webで動作確認
 
-- [ ] `file:../qwq-editor/packages/instant` でローカルリンク
-- [ ] `astro.config.mjs` に `qwqEditorIntegration()` を追加
-- [ ] `editor.config.ts` を qwqb-web ルートに作成
-- [ ] `npm run dev` → `/__editor` で動作確認
-- [ ] `npm run build` でエディタコードが本番バンドルに含まれないことを確認
+- [x] `link:../qwq-editor/packages/*` でローカルリンク（`file:` は workspace:* 解決不可のため `link:` を使用）
+- [x] `astro.config.mjs` に `qwqEditorIntegration()` を追加
+- [x] `editor.config.ts` を qwqb-web ルートに作成（frontmatter定義を content.config.ts に合わせて）
+- [x] `pnpm dev` → `/__editor` で動作確認（API: config/list/content/save/upload + SPA配信）
+- [x] `pnpm build` でエディタコードが本番バンドルに含まれないことを確認（`apply: 'serve'` による除外）
 
 ### フェーズ5: npm publish
 
-- [ ] Changesets 設定
-- [ ] GitHub Actions（CI / publish）
-- [ ] `0.1.0` npm publish
+- [x] Changesets 設定（`access: "public"`, `linked: [["@qwq-net/*"]]`）
+- [x] 各パッケージに `license`, `repository`, `files`, `publishConfig` 追加
+- [x] GitHub Actions CI（`.github/workflows/ci.yml`）
+- [x] GitHub Actions Publish（`.github/workflows/publish.yml` + changesets/action）
+- [ ] `0.1.0` npm publish（GitHubリポジトリ作成・NPM_TOKEN設定後に実行）
 
 ---
 
