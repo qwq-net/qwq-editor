@@ -9,6 +9,8 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Only run when NPM_TOKEN is configured
+    if: vars.ENABLE_PUBLISH == 'true'
     permissions:
       contents: write
       pull-requests: write

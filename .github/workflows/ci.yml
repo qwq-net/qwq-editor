@@ -23,8 +23,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm -r typecheck
-
+      # Build first — editor/instant need core's .d.ts for typecheck
       - run: pnpm -r build
+
+      - run: pnpm -r typecheck
 
       - run: pnpm --filter @qwq-net/core test
