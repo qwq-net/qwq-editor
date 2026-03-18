@@ -70,6 +70,13 @@ export function RichEditor({
 
   const { uploadImage, isUploading } = useImageUpload(editor, storageAdapter, contentContext);
 
+  // Emit initial onChange when editor is ready
+  useEffect(() => {
+    if (!editor || !onChange) return;
+    onChange({ doc: editor.getJSON() as TiptapDoc, frontmatter });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
+
   // Emit onChange when editor content updates
   useEffect(() => {
     if (!editor || !onChange) return;
