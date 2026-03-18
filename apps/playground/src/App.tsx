@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
-import { fromMarkdown, toMDX, toMarkdown, defineConfig } from '@qwq-net/core';
+import { useCallback, useState } from 'react';
+import { toMDX, toMarkdown, defineConfig } from '@qwq-net/core';
 import type { TiptapDoc } from '@qwq-net/core';
 import { RichEditor } from '@qwq-net/editor';
 import '@qwq-net/editor/styles';
@@ -16,203 +16,167 @@ const config = defineConfig({
     editorPath: '/__editor',
   },
   frontmatter: {
-    title:       { type: 'string',  label: 'Title',       required: true },
-    description: { type: 'string',  label: 'Description', required: true },
-    pubDate:     { type: 'date',    label: 'Publish Date', required: true },
-    heroImage:   { type: 'image',   label: 'Hero Image' },
-    tags:        { type: 'tags',    label: 'Tags', options: ['Blog', 'Programming', 'TypeScript'] },
-    draft:       { type: 'boolean', label: 'Draft', defaultValue: false },
+    title:       { type: 'string',  label: 'タイトル',    required: true },
+    description: { type: 'string',  label: '概要',        required: true },
+    pubDate:     { type: 'date',    label: '公開日',      required: true },
+    heroImage:   { type: 'image',   label: 'ヒーロー画像' },
+    tags:        { type: 'tags',    label: 'タグ', options: ['ブログ', 'プログラミング', 'TypeScript'] },
+    draft:       { type: 'boolean', label: '下書き', defaultValue: false },
   },
 });
 
 const instantConfig = config.mode as import('@qwq-net/core').InstantModeConfig;
 
 const SAMPLE_MDX = `---
-title: 'Sample Post'
-description: 'A sample post for testing the playground.'
+title: 'サンプル記事'
+description: 'qwq-editorの動作確認用サンプルです。'
 pubDate: '2026-03-12'
-tags: ['Blog', 'Programming']
+tags: ['ブログ', 'プログラミング']
 draft: false
 ---
 
-## Introduction
+## はじめに
 
-This is a **bold** and _italic_ paragraph with a [link](https://astro.build/).
+これは**太字**と_斜体_を含む段落です。[リンク](https://astro.build/)も使えます。
 
-![Hero image](data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23f7f6f3%22%2F%3E%3Crect%20x%3D%22300%22%20y%3D%22100%22%20width%3D%22200%22%20height%3D%22140%22%20rx%3D%228%22%20fill%3D%22%23e3e2de%22%2F%3E%3Ccircle%20cx%3D%22345%22%20cy%3D%22145%22%20r%3D%2220%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22300%2C240%20380%2C160%20500%2C240%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22400%2C240%20450%2C185%20500%2C240%22%20fill%3D%22%23c8c7c4%22%2F%3E%3Ctext%20x%3D%22400%22%20y%3D%22300%22%20text-anchor%3D%22middle%22%20fill%3D%22%239b9a97%22%20font-size%3D%2224%22%20font-family%3D%22system-ui%2Csans-serif%22%3EHero%20Image%20Placeholder%3C%2Ftext%3E%3C%2Fsvg%3E)
+![ヒーロー画像](data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23f7f6f3%22%2F%3E%3Crect%20x%3D%22300%22%20y%3D%22100%22%20width%3D%22200%22%20height%3D%22140%22%20rx%3D%228%22%20fill%3D%22%23e3e2de%22%2F%3E%3Ccircle%20cx%3D%22345%22%20cy%3D%22145%22%20r%3D%2220%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22300%2C240%20380%2C160%20500%2C240%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22400%2C240%20450%2C185%20500%2C240%22%20fill%3D%22%23c8c7c4%22%2F%3E%3Ctext%20x%3D%22400%22%20y%3D%22300%22%20text-anchor%3D%22middle%22%20fill%3D%22%239b9a97%22%20font-size%3D%2224%22%20font-family%3D%22system-ui%2Csans-serif%22%3EHero%20Image%3C%2Ftext%3E%3C%2Fsvg%3E)
 
-## Code Example
+## コード例
 
 \`\`\`typescript
-const greeting = (name: string) => \`Hello, \${name}!\`;
-console.log(greeting('world'));
+const greet = (name: string) => \`こんにちは、\${name}さん！\`;
+console.log(greet('世界'));
 \`\`\`
 
-## List
+## リスト
 
-- Item one
-- Item two
-- Item three
+- 項目その1
+- 項目その2
+- 項目その3
 
-## Table
+## テーブル
 
-| Feature | Status |
+| 機能 | 状態 |
 |---|---|
-| toMDX | Done |
-| fromMarkdown | Done |
+| toMDX | 完了 |
+| fromMarkdown | 完了 |
 `;
 
-// Data source: either from the textarea or from the RichEditor
-type Source = 'textarea' | 'editor';
-
-type Tab = 'editor' | 'doc' | 'mdx' | 'md';
+type InspectTab = 'doc' | 'mdx' | 'md';
 
 export default function App() {
-  const [input, setInput] = useState(SAMPLE_MDX);
-  const [activeTab, setActiveTab] = useState<Tab>('editor');
-
-  // Track the live editor state separately so edits in the RichEditor
-  // are reflected in the other tabs without re-parsing the textarea.
   const [editorDoc, setEditorDoc] = useState<TiptapDoc | null>(null);
   const [editorFrontmatter, setEditorFrontmatter] = useState<Record<string, unknown>>({});
-  const sourceRef = useRef<Source>('textarea');
-
-  // Determine which data to show in the output tabs
-  let doc: TiptapDoc | null = null;
-  let frontmatter: Record<string, unknown> = {};
-  let parseError: string | null = null;
-
-  if (sourceRef.current === 'editor' && editorDoc) {
-    doc = editorDoc;
-    frontmatter = editorFrontmatter;
-  } else {
-    try {
-      const parsed = fromMarkdown(input);
-      doc = parsed.doc;
-      frontmatter = parsed.frontmatter;
-    } catch (e) {
-      parseError = String(e);
-    }
-  }
-
-  const mdxOutput = doc ? toMDX(doc, frontmatter, instantConfig) : '';
-  const mdOutput = doc ? toMarkdown(doc, frontmatter) : '';
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    sourceRef.current = 'textarea';
-    setInput(e.target.value);
-  };
+  const [inspectTab, setInspectTab] = useState<InspectTab | null>(null);
 
   const handleEditorChange = useCallback(
     (data: { doc: TiptapDoc; frontmatter: Record<string, unknown> }) => {
-      sourceRef.current = 'editor';
       setEditorDoc(data.doc);
       setEditorFrontmatter(data.frontmatter);
     },
     [],
   );
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'editor', label: 'RichEditor' },
-    { id: 'doc',    label: 'TiptapDoc' },
-    { id: 'mdx',    label: 'toMDX()' },
-    { id: 'md',     label: 'toMarkdown()' },
+  const mdxOutput = editorDoc ? toMDX(editorDoc, editorFrontmatter, instantConfig) : '';
+  const mdOutput = editorDoc ? toMarkdown(editorDoc, editorFrontmatter) : '';
+
+  const inspectTabs: { id: InspectTab; label: string }[] = [
+    { id: 'doc', label: 'TiptapDoc' },
+    { id: 'mdx', label: 'toMDX()' },
+    { id: 'md',  label: 'toMarkdown()' },
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '100vh', background: '#1e1e2e' }}>
-      {/* Left: Input textarea */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid #333' }}>
-        <div style={headerStyle}>
-          Input MDX
-          {sourceRef.current === 'editor' && (
-            <span style={{ marginLeft: 8, color: '#a6e3a1', fontSize: 11, fontWeight: 400 }}>
-              (editor → output synced)
-            </span>
-          )}
-        </div>
-        <textarea
-          value={input}
-          onChange={handleTextareaChange}
-          style={textareaStyle}
-          spellCheck={false}
+    <div style={layoutStyle}>
+      {/* Main: RichEditor (full width) */}
+      <div style={editorAreaStyle}>
+        <RichEditor
+          slug="playground-post"
+          config={config}
+          initialContent={SAMPLE_MDX}
+          onChange={handleEditorChange}
         />
       </div>
 
-      {/* Right: Output tabs */}
-      <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', background: '#161616', borderBottom: '1px solid #333', flexShrink: 0 }}>
-          {tabs.map((tab) => (
+      {/* Bottom: Inspect panel (collapsible) */}
+      <div style={inspectBarStyle}>
+        <div style={inspectTabsStyle}>
+          {inspectTabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setInspectTab(inspectTab === tab.id ? null : tab.id)}
               style={{
-                padding: '8px 20px',
-                background: activeTab === tab.id ? '#1e1e2e' : 'transparent',
-                color: activeTab === tab.id ? '#89b4fa' : '#888',
-                border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid #89b4fa' : '2px solid transparent',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 500,
+                ...inspectTabBtnStyle,
+                color: inspectTab === tab.id ? '#2eaadc' : '#787774',
+                borderBottom: inspectTab === tab.id ? '2px solid #2eaadc' : '2px solid transparent',
               }}
             >
               {tab.label}
             </button>
           ))}
         </div>
+      </div>
 
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          {parseError && (
-            <div style={{ padding: '16px', color: '#f38ba8', fontFamily: 'monospace', fontSize: '13px' }}>
-              Parse error: {parseError}
-            </div>
+      {inspectTab && (
+        <div style={inspectPanelStyle}>
+          {inspectTab === 'doc' && editorDoc && (
+            <DocInspector doc={editorDoc} frontmatter={editorFrontmatter} />
           )}
-
-          {/* RichEditor is always mounted but hidden when not active — prevents losing edits on tab switch */}
-          <div style={{ height: '100%', display: activeTab === 'editor' ? 'block' : 'none' }}>
-            <RichEditor
-              slug="playground-post"
-              config={config}
-              initialContent={input}
-              onChange={handleEditorChange}
-            />
-          </div>
-
-          {activeTab === 'doc' && doc && (
-            <DocInspector doc={doc} frontmatter={frontmatter} />
-          )}
-          {activeTab === 'mdx' && (
+          {inspectTab === 'mdx' && (
             <MdxPreview content={mdxOutput} label="MDX output (toMDX)" />
           )}
-          {activeTab === 'md' && (
+          {inspectTab === 'md' && (
             <MdxPreview content={mdOutput} label="Markdown output (toMarkdown)" />
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-const headerStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  fontSize: '13px',
-  fontWeight: 600,
-  color: '#888',
-  background: '#161616',
-  borderBottom: '1px solid #333',
+const layoutStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100vh',
+  background: '#e8e7e3',
+};
+
+const editorAreaStyle: React.CSSProperties = {
+  flex: 1,
+  overflow: 'hidden',
+  minHeight: 0,
+  maxWidth: 960,
+  width: '100%',
+  margin: '0 auto',
+  background: '#ffffff',
+  boxShadow: '0 1px 8px rgba(0, 0, 0, 0.08)',
+};
+
+const inspectBarStyle: React.CSSProperties = {
+  borderTop: '1px solid #e3e2de',
+  background: '#f7f6f3',
   flexShrink: 0,
 };
 
-const textareaStyle: React.CSSProperties = {
-  flex: 1,
-  resize: 'none',
-  background: '#1e1e2e',
-  color: '#cdd6f4',
-  fontFamily: '"Fira Code", "Cascadia Code", monospace',
-  fontSize: '13px',
-  lineHeight: 1.6,
-  padding: '16px',
+const inspectTabsStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 0,
+  padding: '0 16px',
+};
+
+const inspectTabBtnStyle: React.CSSProperties = {
+  padding: '8px 16px',
+  background: 'transparent',
   border: 'none',
-  outline: 'none',
+  cursor: 'pointer',
+  fontSize: 12,
+  fontWeight: 500,
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+};
+
+const inspectPanelStyle: React.CSSProperties = {
+  height: '35vh',
+  overflow: 'auto',
+  borderTop: '1px solid #e3e2de',
+  background: '#1e1e2e',
 };
