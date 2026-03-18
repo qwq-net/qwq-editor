@@ -38,7 +38,7 @@ export function EditPage({ slug, config }: EditPageProps) {
           ← 一覧に戻る
         </a>
         <span style={styles.slug}>{slug}</span>
-        {saveResult && <span style={styles.saved}>保存済: {saveResult}</span>}
+        {saveResult && <span style={styles.saved}>保存済</span>}
       </header>
 
       <div style={styles.editorWrapper}>
@@ -60,31 +60,31 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     height: '100vh',
     overflow: 'hidden',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     gap: 16,
-    padding: '10px 20px',
-    background: '#181825',
-    borderBottom: '1px solid #313244',
+    padding: '10px 24px',
+    background: '#ffffff',
+    borderBottom: '1px solid #e3e2de',
     flexShrink: 0,
   },
   back: {
-    color: '#89b4fa',
+    color: '#9b9a97',
     textDecoration: 'none',
     fontSize: 13,
   },
   slug: {
-    fontFamily: 'monospace',
     fontSize: 14,
-    color: '#a6adc8',
+    color: '#787774',
     flex: 1,
   },
   saved: {
     fontSize: 12,
-    color: '#a6e3a1',
-    fontFamily: 'monospace',
+    color: '#4dab6f',
+    fontWeight: 500,
   },
   editorWrapper: {
     flex: 1,
@@ -95,6 +95,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    color: '#6c7086',
+    color: '#9b9a97',
   },
 };

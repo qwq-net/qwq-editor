@@ -19,6 +19,7 @@ const config = defineConfig({
     title:       { type: 'string',  label: 'Title',       required: true },
     description: { type: 'string',  label: 'Description', required: true },
     pubDate:     { type: 'date',    label: 'Publish Date', required: true },
+    heroImage:   { type: 'image',   label: 'Hero Image' },
     tags:        { type: 'tags',    label: 'Tags', options: ['Blog', 'Programming', 'TypeScript'] },
     draft:       { type: 'boolean', label: 'Draft', defaultValue: false },
   },
@@ -34,14 +35,11 @@ tags: ['Blog', 'Programming']
 draft: false
 ---
 
-import OptimizedImage from '@/components/OptimizedImage.astro';
-import heroImage from './hero.jpg';
-
 ## Introduction
 
 This is a **bold** and _italic_ paragraph with a [link](https://astro.build/).
 
-<OptimizedImage src={heroImage} alt="Hero image" />
+![Hero image](data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23f7f6f3%22%2F%3E%3Crect%20x%3D%22300%22%20y%3D%22100%22%20width%3D%22200%22%20height%3D%22140%22%20rx%3D%228%22%20fill%3D%22%23e3e2de%22%2F%3E%3Ccircle%20cx%3D%22345%22%20cy%3D%22145%22%20r%3D%2220%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22300%2C240%20380%2C160%20500%2C240%22%20fill%3D%22%23d4d3d0%22%2F%3E%3Cpolygon%20points%3D%22400%2C240%20450%2C185%20500%2C240%22%20fill%3D%22%23c8c7c4%22%2F%3E%3Ctext%20x%3D%22400%22%20y%3D%22300%22%20text-anchor%3D%22middle%22%20fill%3D%22%239b9a97%22%20font-size%3D%2224%22%20font-family%3D%22system-ui%2Csans-serif%22%3EHero%20Image%20Placeholder%3C%2Ftext%3E%3C%2Fsvg%3E)
 
 ## Code Example
 

@@ -63,11 +63,13 @@ const loadingStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   height: '100vh',
-  color: '#6c7086',
+  color: '#9b9a97',
   fontSize: 14,
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 };
 
 const errorStyle: React.CSSProperties = {
   padding: 32,
-  color: '#f38ba8',
+  color: '#eb5757',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 };

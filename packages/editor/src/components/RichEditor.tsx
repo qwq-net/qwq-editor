@@ -8,6 +8,11 @@ import { Toolbar } from './Toolbar/index.js';
 import { BubbleMenu } from './BubbleMenu/BubbleMenu.js';
 import { FrontmatterPanel } from './FrontmatterPanel/FrontmatterPanel.js';
 
+/** Get today's date in JST as yyyy-MM-dd */
+function getJSTDateString(): string {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' });
+}
+
 export interface RichEditorProps {
   slug: string;
   config: EditorConfig;
@@ -36,7 +41,23 @@ export function RichEditor({
     contentContext,
   });
 
-  const [frontmatter, setFrontmatter] = useState<Record<string, unknown>>(initialFrontmatter);
+  const [frontmatter, setFrontmatter] = useState<Record<string, unknown>>(() => {
+    // For new content, apply default values from config (especially dates)
+    if (!initialContent && config.frontmatter) {
+      const defaults: Record<string, unknown> = { ...initialFrontmatter };
+      for (const [key, field] of Object.entries(config.frontmatter)) {
+        if (defaults[key] != null) continue;
+        if (field.type === 'date') {
+          // Default date fields to today in JST (yyyy-MM-dd)
+          defaults[key] = getJSTDateString();
+        } else if ('defaultValue' in field && field.defaultValue != null) {
+          defaults[key] = field.defaultValue;
+        }
+      }
+      return defaults;
+    }
+    return initialFrontmatter;
+  });
 
   const { save } = useSave({
     editor,
